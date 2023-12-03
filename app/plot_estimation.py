@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from database import get_dataframe_for_item
-from sample_data_generator import generate_sample_data
 
 def remove_outliers(data):
     # https://saturncloud.io/blog/how-to-detect-and-exclude-outliers-in-a-pandas-dataframe/
@@ -24,7 +23,7 @@ def remove_outliers(data):
 def estimate_and_plot(condition: int, item_description: str):
 
     # get data matching the item description and remove outliers
-    data = remove_outliers(generate_sample_data())
+    data = remove_outliers(get_dataframe_for_item(item_description))
 
     # separate condition and price columns
     X = data[['condition']]
