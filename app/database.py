@@ -17,16 +17,40 @@ client = MongoClient(f"mongodb+srv://{DB_USER}:{DB_PASSWORD}@{DB_URL}")
 db = client[DB_NAME]
 item_collection = db[ITEM_COLLECTION]
 
-def find_by_keyword(query):
+def find_by_keyword(keyword):
+    query = {
+    'title': {
+        '$regex': re.compile(keyword, re.IGNORECASE),
+        } 
+    }
     return list(item_collection.find(query))
 
-def get_dataframe_for_item(item_description):
-    query = {
-        'title': {
-            '$regex': re.compile(item_description, re.IGNORECASE),
-            } 
-        }
 
-    item_data_df = pd.DataFrame(find_by_keyword(query))
+# Use this
+def find_from_index(keyword):
+    pipeline = [
+        {
+            "$search": {
+                "index": "default",
+                "text": {
+                    "query": keyword,
+                    "path": {
+                        "wildcard": "*"
+                    }
+                }
+            }
+        }
+    ]
+    return list(item_collection.aggregate(pipeline))
+
+def get_dataframe_for_item(item_description):
+
+    item_data_df = pd.DataFrame(find_from_index(item_description))
 
     return item_data_df
+
+query1 = {
+    'title': {
+        '$regex': re.compile("a", re.IGNORECASE),
+        } 
+    }
